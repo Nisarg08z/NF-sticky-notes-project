@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            background: white;
+        }
+
+        .box {
+            margin-top: 100px;
+            margin-left: 100px;
+            width: 500px;
+            height: 300px;
+            background: rgb(0, 0, 0);
+        }
+
+        #titel {
+            margin: 20px;
+            width: 460px;
+            height: 40px;
+        }
+
+        #content {
+            margin: 20px;
+            width: 460px;
+            height: 60px;
+        }
+
+        #save {
+            margin: 20px;
+            width: 465px;
+            height: 40px;
+            background: blue;
+            border-radius: 0.5rem;
+        }
+
+        .note {
+            margin: 20px;
+            width: 300px;
+            height: 300px;
+            border: 2px solid black;
+            border-radius: 0.5rem;
+        }
+
+        .note-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+        }
+
+        .note-button {
+            width: 48%;
+            height: 30px;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+        }
+
+        .edit-button {
+            background: orange;
+        }
+
+        .delete-button {
+            background: red;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box" id="box">
+        <textarea name="title" id="titel" placeholder="Titel"></textarea>
+        <textarea name="content" id="content" placeholder="Content"></textarea>
+        <button id="save"> Save Note</button>
+    </div>
+    <div id="output" class="output"></div>
+</body>
+
+</html>
+
+<script>
+    document.getElementById('save').addEventListener('click', function (event) {
+        event.preventDefault();
+        const titel = document.getElementById('titel').value;
+        const content = document.getElementById('content').value;
+
+        if (titel && content) {
+            localStorage.setItem(titel, content);
+            addNoteToOutput(titel, content);
+            document.getElementById('titel').value = '';
+            document.getElementById('content').value = '';
+        }
+    });
+
+    function addNoteToOutput(titel, content) {
+        const note = document.createElement('div');
+        note.classList.add('note');
+
+        note.innerHTML = `
+            <h1>Title</h1>
+            <h2><b>${titel}</b></h2>
+            <h1>Content</h1>
+            <h3>${content}</h3>
+            <div class="note-buttons">
+                <button class="note-button edit-button" onclick="editNote('${titel}')">Edit</button>
+                <button class="note-button delete-button" onclick="deleteNote('${titel}')">Delete</button>
+            </div>
+        `;
+
+        document.getElementById('output').appendChild(note);
+
+        const output = document.getElementById('output');
+        output.style.display = "flex";
+        output.style.flexWrap = "wrap";
+        output.style.margin = "40px";
+    }
+
+    function loadNotes() {
+        for (let i = 0; i < localStorage.length; i++) {
+            const titel = localStorage.key(i);
+            const content = localStorage.getItem(titel);
+            addNoteToOutput(titel, content);
+        }
+    }
+
+    function editNote(titel) {
+        const content = localStorage.getItem(titel);
+        document.getElementById('titel').value = titel;
+        document.getElementById('content').value = content;
+        deleteNote(titel);
+    }
+
+    function deleteNote(titel) {
+        localStorage.removeItem(titel);
+        document.getElementById('output').innerHTML = '';
+        loadNotes();
+    }
+
+    document.addEventListener('DOMContentLoaded', loadNotes);
+</script>
